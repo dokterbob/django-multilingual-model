@@ -2,7 +2,9 @@ from django.db.models import options
 import re
 
 options.DEFAULT_NAMES += ('translation', 'multilingual')
-MULTILINGUAL_FAIL_SILENTLY = False
+MULTILINGUAL_FAIL_SILENTLY = not settings.DEBUG
+MULTILINGUAL_DEFAULT = "en"
+MULTILINGUAL_FALL_BACK_TO_DEFAULT = True
 
 class MultilingualModel(models.Model):
     """Provides support for multilingual fields.
@@ -62,7 +64,12 @@ class MultilingualModel(models.Model):
                 try: 
                     return self._meta.translation.objects.select_related().get(model=self, language__code=code).__dict__[field]
                 except ObjectDoesNotExist:
+                    if MULTILINGUAL_FALL_BACK_TO_DEFAULT and MULTILINGUAL_DEFAULT and code!=MULTILINGUAL_DEFAULT:
+                        try:
+                            return self._meta.translation.objects.select_related().get(model=self, language__code=MULTILINGUAL_DEFAULT).__dict__[field]
+                        except ObjectDoesNotExist:
+                            pass
                     if MULTILINGUAL_FAIL_SILENTLY:
                         return None
-                    break 
-            raise AttributeError, "'%s' object has no attribute '%s'"%(self.__class__.__name__, str(attr))
+                    raise ValueError, "'%s' has no translation in '%s'"%(self, code) 
+        raise AttributeError, "'%s' object has no attribute '%s'"%(self.__class__.__name__, str(attr))
