@@ -28,7 +28,7 @@ class MultilingualModel(models.Model):
         
     def __init__(self, *args, **kwargs):
         super(MultilingualModel, self).__init__(*args, **kwargs)
-        self._language = get_language()[:2]
+        self._language = get_language()
     
     def __getattr__(self, attr):
         # If an attribute is defined in the current model, don't look any further.
@@ -45,7 +45,6 @@ class MultilingualModel(models.Model):
             match = re.match(r'^%s_(?P<code>[a-z_]{2,5})$' % field, str(attr))
             if match:
                 code = match.group('code')
-                code = code[:2] # let's limit it to two letter
                 
                 logger.debug('Regular expression match, resulting code: %s' % code)
                 
@@ -81,7 +80,7 @@ class MultilingualModel(models.Model):
     
     def for_language(self, code):
         """Sets the language for the translation fields of this object"""
-        if code is not None and len(code) == 2:
+        if code is not None and len(code) >= 2 and len(code) <= 5:
             self._language = code
         
     
