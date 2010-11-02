@@ -52,16 +52,11 @@ admin.py::
 	from django.contrib import admin
 	import models
 	
-	from multilingual_model import settings
-	MAX_LANGUAGES = len(settings.LANGUAGES)
+	from multilingual_model.admin import TranslationInline
 	
 	
-	class BookTranslationInline(admin.StackedInline):
+	class BookTranslationInline(TranslationInline):
 	   model = models.BookTranslation
-	   extra = 1
-	   min_num = 1
-	   max_num = MAX_LANGUAGES
-	
 	
 	class BookAdmin(admin.ModelAdmin):
 	   list_display = ["ISBN"]
