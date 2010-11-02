@@ -12,6 +12,8 @@ models.options.DEFAULT_NAMES += ('translation', 'multilingual')
 
 from multilingual_model import settings
 
+LANGUAGE_CODE_RE = re.compile(r'_(?P<code>[a-z_]{2,5})$')
+
 class MultilingualTranslation(models.Model):
     """ Abstract base class for translations. """
     
@@ -40,19 +42,23 @@ class MultilingualModel(models.Model):
         # See whether we can find a translation for the field
         translated_fields = self._meta.translation._meta.get_all_field_names()
         for field in translated_fields:
-            # This is inefficient: we have to compile the re's everytime we do this trick
             code = None
-            match = re.match(r'^%s_(?P<code>[a-z_]{2,5})$' % field, str(attr))
-            if match:
-                code = match.group('code')
+            
+            # Only consider attributes starting with this field name
+            if attr.startswith(field):
+                # If we have a match, see if we can re-match the language code in
+                # the remaining string.
+                match = LANGUAGE_CODE_RE.match(attr[len(field):])
+                if match:
+                    code = match.group('code')
                 
-                logger.debug('Regular expression match, resulting code: %s' % code)
+                    logger.debug('Regular expression match, resulting code: %s' % code)
                 
-            elif attr in translated_fields:
-                code = self._language
-                field = attr
+                elif attr in translated_fields:
+                    code = self._language
+                    field = attr
                 
-                logger.debug('Regular expression not matched but translated field detected.')
+                    logger.debug('Regular expression not matched but translated field detected.')
                 
             if code:
                 try:
