@@ -3,12 +3,13 @@ django-multilingual-model
 Django Simple Multilingual Support for Models.
 
 This is strongly based upon an original project by yazzgoth on Google code.
+
 The original can be found at: http://code.google.com/p/django-multilingual-model/
 
 Usage
 -----
 
-models.py:
+models.py::
 
 	from multilingual_model.models import MultilingualModel, MultilingualTranslation
 	
@@ -42,6 +43,9 @@ models.py:
 
 Admin integration
 -----------------
+
+admin.py::
+
 	from django.contrib import admin
 	import models
 	
