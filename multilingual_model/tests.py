@@ -29,4 +29,19 @@ __test__ = {'doctest': """
 u'Django for Dummies'
 >>> book.description_pl
 u'Django opisane w prostych slowach'
+>>> mybook = Book(ISBN=1234)
+>>> mybook.save()
+>>> trans_en = BookTranslation(parent=mybook, language_code='en', title='Django for dummies', description='Django for absolute nitwits.')
+>>> trans_en.save()
+>>> trans_nl = BookTranslation(parent=mybook, language_code='nl', title='Django voor dummies', description='Django voor complete idioten.')
+>>> trans_nl.save()
+>>> mybook.title_nl
+u'Django voor dummies'
+>>> mybook.title_en
+u'Django for dummies'
+>>> mybook.description_en 
+u'Django for absolute nitwits.'
+>>> mybook.description_nl
+u'Django voor complete idioten.'
+
 """}
