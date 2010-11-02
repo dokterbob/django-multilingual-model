@@ -3,15 +3,13 @@ from django.db import models
 from multilingual_model.models import MultilingualModel, MultilingualTranslation
 
 class BookTranslation(MultilingualTranslation):
+    model = models.ForeignKey('Book', related_name='translations')
+    
     title = models.CharField(max_length=32)
     description = models.TextField()
-    model = models.ForeignKey('Book')
 
 class Book(MultilingualModel):
     ISBN = models.IntegerField()
-
-    class Meta:
-        translation = BookTranslation
 
 __test__ = {'doctest': """
 >>> book = Book(ISBN="1234567890")

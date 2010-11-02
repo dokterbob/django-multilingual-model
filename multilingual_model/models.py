@@ -20,7 +20,7 @@ class MultilingualTranslation(models.Model):
     class Meta:
         abstract = True
     
-    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES)
+    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES, blank=False, null=False)
 
 class MultilingualModel(models.Model):
     """Provides support for multilingual fields. """
@@ -37,10 +37,10 @@ class MultilingualModel(models.Model):
         if attr in self.__dict__:
             return self.__dict__[attr]
         
-        logger.debug('Looking for a translated field for: %s' % attr)
+        #logger.debug('Looking for a translated field for: %s' % attr)
             
         # See whether we can find a translation for the field
-        translated_fields = self._meta.translation._meta.get_all_field_names()
+        translated_fields = self.translations.model._meta.get_all_field_names()
         for field in translated_fields:
             code = None
             
@@ -64,7 +64,7 @@ class MultilingualModel(models.Model):
                 try:
                     logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
                      
-                    translation_obj = self._meta.translation.objects.select_related().get(model=self, language_code=code)
+                    translation_obj = self.translations.select_related().get(model=self, language_code=code)
                     field_value = getattr(translation_obj, field)
                     
                     logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
@@ -75,7 +75,7 @@ class MultilingualModel(models.Model):
                     logger.debug('Lookup failed, attempting fallback or failing silently.')
                     if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
                         try:
-                            translation_obj = self._meta.translation.objects.select_related().get(model=self, language_code=settings.DEFAULT_LANGUAGE)
+                            translation_obj = self.translations.select_related().get(model=self, language_code=settings.DEFAULT_LANGUAGE)
                             field_value = getattr(translation_obj, field)
                             
                             logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
@@ -94,5 +94,10 @@ class MultilingualModel(models.Model):
         """Sets the language for the translation fields of this object"""
         if code is not None and len(code) >= 2 and len(code) <= 5:
             self._language = code
-        
     
+    # def contribute_to_class(self, cls):
+    #     logger.debug('Adding foreignkey to translation field')
+    # 
+    #     backlink = models.ForeignKey(cls)
+    #     backlink.contribute_to_class(cls._meta.translation, 'model')
+    # 
