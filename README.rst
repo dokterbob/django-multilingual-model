@@ -52,10 +52,15 @@ admin.py::
 	from django.contrib import admin
 	import models
 	
+	from multilingual_model import settings
+	MAX_LANGUAGES = len(settings.LANGUAGES)
+	
+	
 	class BookTranslationInline(admin.StackedInline):
 	   model = models.BookTranslation
 	   extra = 1
 	   min_num = 1
+	   max_num = MAX_LANGUAGES
 	
 	
 	class BookAdmin(admin.ModelAdmin):
