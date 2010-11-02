@@ -1,14 +1,12 @@
 from django.db import models
-from django.conf import settings
 from django.utils.translation import get_language
 from django.core.exceptions import ObjectDoesNotExist
 import re
 
+# What does this line of code do?
 models.options.DEFAULT_NAMES += ('translation', 'multilingual')
-MULTILINGUAL_FAIL_SILENTLY = not settings.DEBUG
-MULTILINGUAL_DEFAULT = "en"
-MULTILINGUAL_FALL_BACK_TO_DEFAULT = True
 
+from multilingual_model import settings
 
 class MultilingualModel(models.Model):
     """Provides support for multilingual fields.
@@ -77,12 +75,12 @@ class MultilingualModel(models.Model):
                 try: 
                     return self._meta.translation.objects.select_related().get(model=self, language__code=code).__dict__[field]
                 except ObjectDoesNotExist:
-                    if MULTILINGUAL_FALL_BACK_TO_DEFAULT and MULTILINGUAL_DEFAULT and code != MULTILINGUAL_DEFAULT:
+                    if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
                         try:
                             return self._meta.translation.objects.select_related().get(model=self, language__code=MULTILINGUAL_DEFAULT).__dict__[field]
                         except ObjectDoesNotExist:
                             pass
-                    if MULTILINGUAL_FAIL_SILENTLY:
+                    if settings.FAIL_SILENTLY:
                         return None
                     raise ValueError, "'%s' has no translation in '%s'"%(self, code) 
         raise AttributeError, "'%s' object has no attribute '%s'"%(self.__class__.__name__, str(attr))
