@@ -11,17 +11,17 @@ Usage
 models.py:
 
 	from multilingual_model.models import MultilingualModel, MultilingualTranslation
-
+	
 	class BookTranslation(MultilingualTranslation):
 	    parent = models.ForeignKey('Book', related_name='translations')
-    
+	    
 	    title = models.CharField(max_length=32)
 	    description = models.TextField()
-
+	
 	class Book(MultilingualModel):
 	    ISBN = models.IntegerField()
-
-
+	
+	
 	>>> book = Book(ISBN="1234567890")
 	>>> book.save()
 	>>> book_en = BookTranslation(language_code='en')
@@ -44,16 +44,16 @@ Admin integration
 -----------------
 	from django.contrib import admin
 	import models
-
+	
 	class BookTranslationInline(admin.StackedInline):
 	   model = models.BookTranslation
 	   extra = 1
 	   min_num = 1
-
-
+	
+	
 	class BookAdmin(admin.ModelAdmin):
 	   list_display = ["ISBN"]
 	   inlines = [BookTranslationInline]
-
+	
 	admin.site.register(models.Book, BookAdmin)
-
+	
