@@ -12,7 +12,6 @@ class Book(MultilingualModel):
 
     class Meta:
         translation = BookTranslation
-        multilingual = ['title', 'description']
 
 __test__ = {'doctest': """
 >>> book = Book(ISBN="1234567890")

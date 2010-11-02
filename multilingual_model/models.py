@@ -38,7 +38,9 @@ class MultilingualModel(models.Model):
         logger.debug('Looking for a translated field for: %s' % attr)
             
         # See whether we can find a translation for the field
-        for field in self._meta.multilingual:
+        translated_fields = self._meta.translation._meta.get_all_field_names()
+        for field in translated_fields:
+            # This is inefficient: we have to compile the re's everytime we do this trick
             code = None
             match = re.match(r'^%s_(?P<code>[a-z_]{2,5})$' % field, str(attr))
             if match:
@@ -47,7 +49,7 @@ class MultilingualModel(models.Model):
                 
                 logger.debug('Regular expression match, resulting code: %s' % code)
                 
-            elif attr in self._meta.multilingual:
+            elif attr in translated_fields:
                 code = self._language
                 field = attr
                 
