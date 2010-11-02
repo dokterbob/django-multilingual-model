@@ -59,7 +59,7 @@ class MultilingualModel(models.Model):
                     logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
                      
                     translation_obj = self._meta.translation.objects.select_related().get(model=self, language_code=code)
-                    field_value = translation_obj.__dict__[field]
+                    field_value = getattr(translation_obj, field)
                     
                     logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
                     
@@ -69,7 +69,13 @@ class MultilingualModel(models.Model):
                     logger.debug('Lookup failed, attempting fallback or failing silently.')
                     if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
                         try:
-                            return self._meta.translation.objects.select_related().get(model=self, language_code=settings.DEFAULT_LANGUAGE).__dict__[field]
+                            translation_obj = self._meta.translation.objects.select_related().get(model=self, language_code=settings.DEFAULT_LANGUAGE)
+                            field_value = getattr(translation_obj, field)
+                            
+                            logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
+                            
+                            return field_value
+
                         except ObjectDoesNotExist:
                             pass
                     if settings.FAIL_SILENTLY:
