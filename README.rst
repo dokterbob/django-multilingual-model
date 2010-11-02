@@ -14,6 +14,9 @@ models.py::
 	from multilingual_model.models import MultilingualModel, MultilingualTranslation
 	
 	class BookTranslation(MultilingualTranslation):
+	    class Meta:
+	        unique_together = ('parent', 'language_code')
+	    
 	    parent = models.ForeignKey('Book', related_name='translations')
 	    
 	    title = models.CharField(max_length=32)
