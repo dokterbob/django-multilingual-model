@@ -9,50 +9,16 @@ models.options.DEFAULT_NAMES += ('translation', 'multilingual')
 from multilingual_model import settings
 
 class MultilingualTranslation(models.Model):
+    """ Abstract base class for translations. """
+    
     class Meta:
         abstract = True
     
     language_code = models.CharField(max_length=5, choices=settings.LANGUAGES)
 
 class MultilingualModel(models.Model):
-    """Provides support for multilingual fields.
+    """Provides support for multilingual fields. """
     
-    Example:
-        
-    class BookTranslation(MultilingualTranslation):
-        title = models.CharField(max_length=32)
-        description = models.TextField()
-        model = models.ForeignKey("Book")
-        
-    class Book(MultilingualModel):
-        ISBN = models.IntegerField()
-        
-        class Meta:
-            translation = BookTranslation
-            multilingual = ['title', 'description']
-            
-    lang_en = Language(code="en", name="English")
-    lang_en.save()
-    lang_pl = Language(code="pl", name="Polish")
-    book = Book(ISBN="1234567890")
-    book.save()
-    book_en = BookTranslation()
-    book_en.title = "Django for Dummies"
-    book_en.description = "Django described in simple words."
-    book_en.model = book
-    book_en.save()
-    book_pl = BookTranslation()
-    book_pl.title = "Django dla Idiotow"
-    book_pl.description = "Django opisane w prostych slowach"
-    book_pl.model = book
-    book_pl.save()
-    
-    # now here comes the magic
-    book.title_en
-    u'Django for Dummies'
-    book.description_pl
-    u'Django opisane w prostych slowach'
-    """
     class Meta:
         abstract = True
         
@@ -78,7 +44,7 @@ class MultilingualModel(models.Model):
                 except ObjectDoesNotExist:
                     if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
                         try:
-                            return self._meta.translation.objects.select_related().get(model=self, language_code=MULTILINGUAL_DEFAULT).__dict__[field]
+                            return self._meta.translation.objects.select_related().get(model=self, language_code=settings.DEFAULT_LANGUAGE).__dict__[field]
                         except ObjectDoesNotExist:
                             pass
                     if settings.FAIL_SILENTLY:
