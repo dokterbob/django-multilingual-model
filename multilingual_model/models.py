@@ -8,17 +8,18 @@ models.options.DEFAULT_NAMES += ('translation', 'multilingual')
 
 from multilingual_model import settings
 
+class MultilingualTranslation(models.Model):
+    class Meta:
+        abstract = True
+    
+    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES)
+
 class MultilingualModel(models.Model):
     """Provides support for multilingual fields.
     
     Example:
-    
-    class Language(models.Model):
-        code = models.CharField(max_length=5)
-        name = models.CharField(max_length=16)
         
-    class BookTranslation(models.Model):
-        language = models.ForeignKey("Language")
+    class BookTranslation(MultilingualTranslation):
         title = models.CharField(max_length=32)
         description = models.TextField()
         model = models.ForeignKey("Book")
@@ -73,11 +74,11 @@ class MultilingualModel(models.Model):
                 field = attr
             if code is not None:
                 try: 
-                    return self._meta.translation.objects.select_related().get(model=self, language__code=code).__dict__[field]
+                    return self._meta.translation.objects.select_related().get(model=self, language_code=code).__dict__[field]
                 except ObjectDoesNotExist:
                     if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
                         try:
-                            return self._meta.translation.objects.select_related().get(model=self, language__code=MULTILINGUAL_DEFAULT).__dict__[field]
+                            return self._meta.translation.objects.select_related().get(model=self, language_code=MULTILINGUAL_DEFAULT).__dict__[field]
                         except ObjectDoesNotExist:
                             pass
                     if settings.FAIL_SILENTLY:
