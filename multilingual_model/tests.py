@@ -17,12 +17,12 @@ class Book(MultilingualModel):
 __test__ = {'doctest': """
 >>> book = Book(ISBN="1234567890")
 >>> book.save()
->>> book_en = BookTranslation()
+>>> book_en = BookTranslation(language_code='en')
 >>> book_en.title = "Django for Dummies"
 >>> book_en.description = "Django described in simple words."
 >>> book_en.model = book
 >>> book_en.save()
->>> book_pl = BookTranslation()
+>>> book_pl = BookTranslation(language_code='pl')
 >>> book_pl.title = "Django dla Idiotow"
 >>> book_pl.description = "Django opisane w prostych slowach"
 >>> book_pl.model = book
