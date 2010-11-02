@@ -17,6 +17,8 @@ LANGUAGE_CODE_RE = re.compile(r'_(?P<code>[a-z_]{2,5})$')
 class MultilingualTranslation(models.Model):
     """ Abstract base class for translations. """
     
+    # TO DO: Somehow make sure that this model contains a FK with related_name='translations'.
+    
     class Meta:
         abstract = True
     
@@ -64,7 +66,7 @@ class MultilingualModel(models.Model):
                 try:
                     logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
                      
-                    translation_obj = self.translations.select_related().get(model=self, language_code=code)
+                    translation_obj = self.translations.select_related().get(language_code=code)
                     field_value = getattr(translation_obj, field)
                     
                     logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
@@ -75,7 +77,7 @@ class MultilingualModel(models.Model):
                     logger.debug('Lookup failed, attempting fallback or failing silently.')
                     if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
                         try:
-                            translation_obj = self.translations.select_related().get(model=self, language_code=settings.DEFAULT_LANGUAGE)
+                            translation_obj = self.translations.select_related().get(language_code=settings.DEFAULT_LANGUAGE)
                             field_value = getattr(translation_obj, field)
                             
                             logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
