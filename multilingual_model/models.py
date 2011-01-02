@@ -23,7 +23,8 @@ class MultilingualTranslation(models.Model):
     class Meta:
         abstract = True
     
-    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES, blank=False, null=False)
+    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES, 
+                                     blank=False, null=False)
 
 
 class MultilingualModel(models.Model):
@@ -65,10 +66,12 @@ class MultilingualModel(models.Model):
                     logger.debug('Regular expression not matched but translated field detected.')
                 
             if code:
+                translations = self.translations.select_related()
+                
                 try:
                     logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
                      
-                    translation_obj = self.translations.select_related().get(language_code=code)
+                    translation_obj = translations.get(language_code=code)
                     field_value = getattr(translation_obj, field)
                     
                     logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
@@ -77,9 +80,15 @@ class MultilingualModel(models.Model):
                     
                 except ObjectDoesNotExist:
                     logger.debug('Lookup failed, attempting fallback or failing silently.')
-                    if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE and code != settings.DEFAULT_LANGUAGE:
+                    
+                    if settings.FALL_BACK_TO_DEFAULT and \
+                       settings.DEFAULT_LANGUAGE and \
+                       code != settings.DEFAULT_LANGUAGE:
+                       
                         try:
-                            translation_obj = self.translations.select_related().get(language_code=settings.DEFAULT_LANGUAGE)
+                            translation_obj = translations.get(language_code=\
+                                                    settings.DEFAULT_LANGUAGE)
+                            
                             field_value = getattr(translation_obj, field)
                             
                             logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
@@ -88,14 +97,19 @@ class MultilingualModel(models.Model):
 
                         except ObjectDoesNotExist:
                             pass
+                    
                     if settings.FAIL_SILENTLY:
                         return None
-                    raise ValueError, "'%s' has no translation in '%s'"%(self, code)
+                    
+                    raise ValueError, "'%s' has no translation in '%s'" \
+                        % (self, code)
 
-        raise AttributeError, "'%s' object has no attribute '%s'"%(self.__class__.__name__, str(attr))
+        raise AttributeError, "'%s' object has no attribute '%s'" \
+            % (self.__class__.__name__, str(attr))
     
     def for_language(self, code):
         """Sets the language for the translation fields of this object"""
+        
         if code is not None and len(code) >= 2 and len(code) <= 5:
             self._language = code
     
