@@ -102,11 +102,11 @@ class MultilingualModel(models.Model):
                     if settings.FAIL_SILENTLY:
                         return None
                     
-                    raise ValueError, "'%s' has no translation in '%s'" \
-                        % (self, code)
+                    raise ValueError, "'%s' object with pk '%s' has no translation to '%s'" \
+                        % (self._meta.object_name, self.pk, code)
 
         raise AttributeError, "'%s' object has no attribute '%s'" \
-            % (self.__class__.__name__, str(attr))
+            % (self._meta.object_name, str(attr))
     
     def for_language(self, code):
         """Sets the language for the translation fields of this object"""
