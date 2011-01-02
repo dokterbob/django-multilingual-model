@@ -24,7 +24,8 @@ class MultilingualTranslation(models.Model):
         abstract = True
     
     language_code = models.CharField(max_length=5, choices=settings.LANGUAGES, 
-                                     blank=False, null=False)
+                                     blank=False, null=False,
+                                     default=settings.DEFAULT_LANGUAGE)
 
 
 class MultilingualModel(models.Model):
