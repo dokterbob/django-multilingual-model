@@ -14,6 +14,7 @@ from multilingual_model import settings
 
 LANGUAGE_CODE_RE = re.compile(r'_(?P<code>[a-z_]{2,5})$')
 
+
 class MultilingualTranslation(models.Model):
     """ Abstract base class for translations. """
     
@@ -23,6 +24,7 @@ class MultilingualTranslation(models.Model):
         abstract = True
     
     language_code = models.CharField(max_length=5, choices=settings.LANGUAGES, blank=False, null=False)
+
 
 class MultilingualModel(models.Model):
     """Provides support for multilingual fields. """
