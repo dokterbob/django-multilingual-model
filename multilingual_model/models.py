@@ -38,6 +38,24 @@ class MultilingualModel(models.Model):
         super(MultilingualModel, self).__init__(*args, **kwargs)
         self._language = get_language()
     
+    def _get_translation(self, field, code):
+        """ 
+        Gets the translation of a specific field for a specific language code.
+        
+        This raises ObjectDoesNotExist if the lookup was unsuccesful.
+        """
+        translations = self.translations.select_related()
+
+        logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
+         
+        translation_obj = translations.get(language_code=code)
+        field_value = getattr(translation_obj, field)
+        
+        logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
+        
+        return field_value
+        
+
     def __getattr__(self, attr):
         # If an attribute is defined in the current model, don't look any further.
         if attr in self.__dict__:
@@ -67,44 +85,45 @@ class MultilingualModel(models.Model):
                     logger.debug('Regular expression not matched but translated field detected.')
                 
             if code:
-                translations = self.translations.select_related()
-                
                 try:
-                    logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
-                     
-                    translation_obj = translations.get(language_code=code)
-                    field_value = getattr(translation_obj, field)
-                    
-                    logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
-                    
-                    return field_value
-                    
-                except ObjectDoesNotExist:
-                    logger.debug('Lookup failed, attempting fallback or failing silently.')
-                    
-                    if settings.FALL_BACK_TO_DEFAULT and \
-                       settings.DEFAULT_LANGUAGE and \
-                       code != settings.DEFAULT_LANGUAGE:
-                       
-                        try:
-                            translation_obj = translations.get(language_code=\
-                                                    settings.DEFAULT_LANGUAGE)
-                            
-                            field_value = getattr(translation_obj, field)
-                            
-                            logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
-                            
-                            return field_value
+                    return self._get_translation(field, code)
 
+                except ObjectDoesNotExist:
+                    # See if we can make a match by base language
+                    base_pos = code.find('-')
+                    if base_pos > 0:
+                        base_code = code[:base_pos]
+
+                        logger.debug('Attempting a match for the base \'%s\'', 
+                                     base_code)
+                        
+                        try:
+                            return self._get_translation(field, base_code)
                         except ObjectDoesNotExist:
                             pass
                     
+                    logger.debug('Lookup failed, attempting fallback or failing silently.')
+                    
+                    # If we're using a default language and the current
+                    # language is not the default language (which has already
+                    # been checked), lookup the value for the default language.
+                    if settings.FALL_BACK_TO_DEFAULT and \
+                       settings.DEFAULT_LANGUAGE and \
+                       code != settings.DEFAULT_LANGUAGE:
+               
+                        try:
+                            return self._get_translation(field, settings.DEFAULT_LANGUAGE)
+
+                        except ObjectDoesNotExist:
+                            pass
+            
                     if settings.FAIL_SILENTLY:
                         return None
-                    
+            
                     raise ValueError, "'%s' object with pk '%s' has no translation to '%s'" \
                         % (self._meta.object_name, self.pk, code)
-
+    
+        
         raise AttributeError, "'%s' object has no attribute '%s'" \
             % (self._meta.object_name, str(attr))
     
