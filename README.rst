@@ -71,3 +71,20 @@ admin.py::
 	
 	admin.site.register(models.Book, BookAdmin)
 	
+
+`__unicode__` representation using translated field
+===================================================
+
+In order to make translation of the `__unicode__` function work, some magic
+is required. Using somthing like this has worked for me - but this has not
+been tested throughly::
+
+	def __unicode__(self):
+	    name = self.name
+	    
+	    # If we don't do this, all hell will rain down on us
+	    if not name:
+	            name = u''
+	    
+	    return name
+	
