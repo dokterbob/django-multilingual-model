@@ -59,6 +59,12 @@ class BookTestCase(TestCase):
         self.book_en.description = "Django described in simple words."
         self.book_en.parent = self.book
         self.book_en.save()
+
+        self.book_en_us = BookTranslation(language_code='en-us')
+        self.book_en_us.title = "Django for Dumbo's"
+        self.book_en_us.description = "Django described in simple woords."
+        self.book_en_us.parent = self.book
+        self.book_en_us.save()
         
         self.book_pl = BookTranslation(language_code='pl')
         self.book_pl.title = "Django dla Idiotow"
@@ -79,13 +85,17 @@ class BookTestCase(TestCase):
             within the model.
         """
         
-        # Set the language
+        for test_lang in ('pl', 'en'):
+            # Set the language
+            from django.utils import translation
+            translation.activate(test_lang)
         
-        # Get the book
-        book = Book.objects.get(ISBN=self.book.ISBN)
+            # Get the book
+            book = Book.objects.get(ISBN=self.book.ISBN)
         
-        # Check if the language set in book's init is actually the right
-        # language.
+            # Check if the language set in book's init is actually the right
+            # language.
+            self.assertEquals(book._language, test_lang)
     
     def test_base_locale_default(self):
         """ Explicitly request the title in a specific sublocale (en-us) and
@@ -93,18 +103,16 @@ class BookTestCase(TestCase):
         """
         
         # assert equality of self.book_en.title and self.book.title_en_us
-        pass
+        self.assertEquals(self.book_en.title, self.book.title_en_kk)
      
     def test_base_locale_explicit(self):
          """ Test whether we can explicitly get the value of a string in 
              a specific sub-locale - through something like book.title_en_us.
          """
-         
-         # Add a translation for the book to en-us with some unique value
-         
+                  
          # Assert equality of book.title_en_us to this unique value
-         pass
-     
+         self.assertEqual(self.book.title_en_us, self.book_en_us.title)
+         
     def test_nonexisting_field(self):
          """ Check whether requesting an unknown field actually raises an
              AttributeError.
