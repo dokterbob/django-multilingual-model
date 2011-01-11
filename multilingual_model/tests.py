@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.test import TestCase
+
 from multilingual_model.models import MultilingualModel, MultilingualTranslation
 
 class BookTranslation(MultilingualTranslation):
@@ -43,5 +45,96 @@ u'Django for dummies'
 u'Django for absolute nitwits.'
 >>> mybook.description_nl
 u'Django voor complete idioten.'
-
 """}
+
+class BookTestCase(TestCase):
+    def setUp(self):
+        """ Setup a book with translations. """
+        
+        self.book = Book(ISBN="1234567890")
+        self.book.save()
+        
+        self.book_en = BookTranslation(language_code='en')
+        self.book_en.title = "Django for Dummies"
+        self.book_en.description = "Django described in simple words."
+        self.book_en.parent = self.book
+        self.book_en.save()
+        
+        self.book_pl = BookTranslation(language_code='pl')
+        self.book_pl.title = "Django dla Idiotow"
+        self.book_pl.description = "Django opisane w prostych slowach"
+        self.book_pl.parent = self.book
+        self.book_pl.save()
+
+    def test_explicit(self):
+        """ Test explicit request for a specific language. This is basically
+            a mockup of the original docstring test.
+        """
+        
+        self.assertEquals(self.book.title_en, self.book_en.title)
+        self.assertEquals(self.book.title_pl, self.book_pl.title)
+    
+    def test_language_detection(self):
+        """ Set the language to 'pl' and test whether this is detected from
+            within the model.
+        """
+        
+        # Set the language
+        
+        # Get the book
+        book = Book.objects.get(ISBN=self.book.ISBN)
+        
+        # Check if the language set in book's init is actually the right
+        # language.
+    
+    def test_base_locale_default(self):
+        """ Explicitly request the title in a specific sublocale (en-us) and
+            check whether we will get the available base locale instead.
+        """
+        
+        # assert equality of self.book_en.title and self.book.title_en_us
+        pass
+     
+    def test_base_locale_explicit(self):
+         """ Test whether we can explicitly get the value of a string in 
+             a specific sub-locale - through something like book.title_en_us.
+         """
+         
+         # Add a translation for the book to en-us with some unique value
+         
+         # Assert equality of book.title_en_us to this unique value
+         pass
+     
+    def test_nonexisting_field(self):
+         """ Check whether requesting an unknown field actually raises an
+             AttributeError.
+         """
+
+         # assert an exception for self.book.bananas
+         pass
+         
+    def test_nonexisting_translation(self):
+        """ Test whether requesting a non-existing translation (when no
+        default translation has been used) raises an AttributeError. """
+
+        # assert an exception for self.book.title_kk
+        pass
+      
+    def test_default_translation(self):
+        """ Test to see whether the default translation is returned when
+        a default language has been specified and fallback to default
+        is enabled.
+        """
+
+        # Check whether the settings are applicable for this test to work
+
+        # Set the language to something not either pl or en
+
+        # Get the book
+        book = Book.objects.get(ISBN=self.book.ISBN)
+
+        # Get the titel in the default language
+        #title_default = 
+
+        # Assert that book.title equals the title in the default language
+
