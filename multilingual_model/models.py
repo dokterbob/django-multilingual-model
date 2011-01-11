@@ -19,8 +19,6 @@ LANGUAGE_CODE_RE = re.compile(r'_(?P<base_code>[a-z]{2,5})(_(?P<ext_code>[a-z]{2
 class MultilingualTranslation(models.Model):
     """ Abstract base class for translations. """
     
-    # TO DO: Somehow make sure that this model contains a FK with related_name='translations'.
-    
     class Meta:
         abstract = True
     
@@ -173,10 +171,3 @@ class MultilingualModel(models.Model):
         
         if code is not None and len(code) >= 2 and len(code) <= 5:
             self._language = code
-    
-    # def contribute_to_class(self, cls):
-    #     logger.debug('Adding foreignkey to translation field')
-    # 
-    #     backlink = models.ForeignKey(cls)
-    #     backlink.contribute_to_class(cls._meta.translation, 'model')
-    # 
