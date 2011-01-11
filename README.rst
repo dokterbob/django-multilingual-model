@@ -8,6 +8,13 @@ The original can be found at: http://code.google.com/p/django-multilingual-model
 
 Usage
 -----
+When a property of a translation is set for the language currently selected
+in this thread, it will automatically yield the right value of that property
+for the current language. So for a book which has a tranlation in `en`,
+requesting `book.title` from within a template from a client of which the
+detected language is English, will simply yield the English translation of the
+book title.
+
 
 models.py::
 
