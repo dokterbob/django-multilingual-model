@@ -119,30 +119,33 @@ class BookTestCase(TestCase):
          """
 
          # assert an exception for self.book.bananas
-         pass
+         with self.assertRaises(AttributeError):
+             self.book.bananas
          
     def test_nonexisting_translation(self):
         """ Test whether requesting a non-existing translation (when no
-        default translation has been used) raises an AttributeError. """
-
-        # assert an exception for self.book.title_kk
-        pass
-      
-    def test_default_translation(self):
-        """ Test to see whether the default translation is returned when
-        a default language has been specified and fallback to default
-        is enabled.
+        default translation has been used) raises an AttributeError. If 
+        `FALL_BACK_TO_DEFAULT` and `DEFAULT_LANGUAGE` have been specified -
+        chekc if we're actually returning the default.
         """
 
-        # Check whether the settings are applicable for this test to work
-
-        # Set the language to something not either pl or en
-
-        # Get the book
-        book = Book.objects.get(ISBN=self.book.ISBN)
-
-        # Get the titel in the default language
-        #title_default = 
-
-        # Assert that book.title equals the title in the default language
-
+        # Only do this if no default translation has been defined
+        from multilingual_model import settings
+        
+        if settings.FALL_BACK_TO_DEFAULT and settings.DEFAULT_LANGUAGE:
+            # See if we're given the default language
+            
+            result = self.book.title_dk
+            
+            attribute = 'title_%s' % \
+                settings.DEFAULT_LANGUAGE.replace('-','_')
+            
+            self.assertEqual(getattr(self.book, attribute), result)
+        
+        else:
+            # No defaults have been specifed
+            
+            # assert an exception for self.book.title_kk
+            with self.assertRaises(AttributeError):
+                self.book.title_dk
+        
