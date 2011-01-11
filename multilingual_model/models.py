@@ -12,7 +12,8 @@ models.options.DEFAULT_NAMES += ('translation', 'multilingual')
 
 from multilingual_model import settings
 
-LANGUAGE_CODE_RE = re.compile(r'_(?P<code>[a-z_]{2,5})$')
+# Match something like en, but also en_us
+LANGUAGE_CODE_RE = re.compile(r'_(?P<base_code>[a-z]{2,5})(_(?P<ext_code>[a-z]{2,5})){0,1}$')
 
 
 class MultilingualTranslation(models.Model):
@@ -74,12 +75,22 @@ class MultilingualModel(models.Model):
                 # the remaining string.
                 match = LANGUAGE_CODE_RE.match(attr[len(field):])
                 if match:
-                    code = match.group('code')
+                    base_code = match.group('base_code')
+                    ext_code = match.group('ext_code')
+
+                    # TODO: CLEANUP
+                    # This is ugly code and redundant.
+                    
+                    if ext_code:
+                        code = '%s-%s' % (base_code, ext_code)
+                    else:
+                        code = base_code
                 
                     logger.debug('Regular expression match, resulting code: %s' % code)
                 
                 elif attr in translated_fields:
                     code = self._language
+                    base_code = None
                     field = attr
                 
                     logger.debug('Regular expression not matched but translated field detected.')
@@ -89,11 +100,15 @@ class MultilingualModel(models.Model):
                     return self._get_translation(field, code)
 
                 except ObjectDoesNotExist:
-                    # See if we can make a match by base language
-                    base_pos = code.find('-')
-                    if base_pos > 0:
-                        base_code = code[:base_pos]
-
+                    # TODO: CLEANUP
+                    # This is ugly code and redundant.
+                    if not base_code:
+                        base_pos = code.find('-')
+                        if base_pos > 0:
+                            base_code = code[:base_pos]
+                    
+                    if base_code:
+                    
                         logger.debug('Attempting a match for the base \'%s\'', 
                                      base_code)
                         
