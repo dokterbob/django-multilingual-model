@@ -38,18 +38,44 @@ class MultilingualModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(MultilingualModel, self).__init__(*args, **kwargs)
         self._language = get_language()
+        self._translation_cache = {}
     
     def _get_translation(self, field, code):
         """ 
         Gets the translation of a specific field for a specific language code.
         
-        This raises ObjectDoesNotExist if the lookup was unsuccesful.
+        This raises ObjectDoesNotExist if the lookup was unsuccesful. As of
+        today, this stuff is cached. As the cache is rather aggressive it
+        might cause rather strange effects. However, we would see the same
+        effects when an ordinary object is changed which is already in memory:
+        the old state would remain.
         """
-        translations = self.translations.select_related()
+        
+        if not self._translation_cache.has_key(code):
+            translations = self.translations.select_related()
 
-        logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
-         
-        translation_obj = translations.get(language_code=code)
+            logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
+            
+            try:
+                translation_obj = translations.get(language_code=code)
+                
+            except ObjectDoesNotExist:
+                translation_obj = None
+                    
+            self._translation_cache[code] = translation_obj
+
+            logger.debug('Translation not found in cache.')
+        
+        else:
+            logger.debug('Translation found in cache.')
+            # Get the translation from the cache
+            translation_obj = self._translation_cache.get(code)        
+        
+        # If this is none, it means that a translation does not exist
+        # It is important to cache this one as well
+        if not translation_obj:
+            raise ObjectDoesNotExist
+        
         field_value = getattr(translation_obj, field)
         
         logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
