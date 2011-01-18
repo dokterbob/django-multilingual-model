@@ -76,15 +76,8 @@ admin.py::
 ===================================================
 
 In order to make translation of the `__unicode__` function work, some magic
-is required. Using somthing like this has worked for me - but this has not
-been tested throughly::
+is required. A helper method for this is included by default, allowing you to do the following::
 
 	def __unicode__(self):
-	    name = self.name
-	    
-	    # If we don't do this, all hell will rain down on us
-	    if not name:
-	            name = u''
-	    
-	    return name
+	    return self.update_wrapper('name')
 	
