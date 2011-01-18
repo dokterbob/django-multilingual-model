@@ -18,13 +18,12 @@ LANGUAGE_CODE_RE = re.compile(r'_(?P<base_code>[a-z]{2,5})(_(?P<ext_code>[a-z]{2
 
 class MultilingualTranslation(models.Model):
     """ Abstract base class for translations. """
-    
+
     class Meta:
         abstract = True
-    
-    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES, 
-                                     blank=False, null=False,
-                                     default=settings.DEFAULT_LANGUAGE)
+
+    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES,
+                                     blank=False, null=False)
 
 
 class MultilingualModel(models.Model):
