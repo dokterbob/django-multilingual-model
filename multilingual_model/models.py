@@ -2,6 +2,7 @@ import logging
 
 logger = logging.getLogger('multilingual_model')
 
+from django.utils.translation import ugettext
 from django.db import models
 from django.utils.translation import get_language
 from django.core.exceptions import ObjectDoesNotExist
@@ -28,70 +29,70 @@ class MultilingualTranslation(models.Model):
 
 class MultilingualModel(models.Model):
     """Provides support for multilingual fields. """
-    
+
     class Meta:
         abstract = True
-        
+
     def __init__(self, *args, **kwargs):
         super(MultilingualModel, self).__init__(*args, **kwargs)
         self._language = get_language()
         self._translation_cache = {}
-    
+
     def _get_translation(self, field, code):
-        """ 
+        """
         Gets the translation of a specific field for a specific language code.
-        
+
         This raises ObjectDoesNotExist if the lookup was unsuccesful. As of
         today, this stuff is cached. As the cache is rather aggressive it
         might cause rather strange effects. However, we would see the same
         effects when an ordinary object is changed which is already in memory:
         the old state would remain.
         """
-        
+
         if not self._translation_cache.has_key(code):
             translations = self.translations.select_related()
 
             logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
-            
+
             try:
                 translation_obj = translations.get(language_code=code)
-                
+
             except ObjectDoesNotExist:
                 translation_obj = None
-                    
+
             self._translation_cache[code] = translation_obj
 
             logger.debug('Translation not found in cache.')
-        
+
         else:
             logger.debug('Translation found in cache.')
             # Get the translation from the cache
-            translation_obj = self._translation_cache.get(code)        
-        
+            translation_obj = self._translation_cache.get(code)
+
         # If this is none, it means that a translation does not exist
         # It is important to cache this one as well
         if not translation_obj:
             raise ObjectDoesNotExist
-        
+
         field_value = getattr(translation_obj, field)
-        
+
         logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
-        
+
         return field_value
-        
+
 
     def __getattr__(self, attr):
         # If an attribute is defined in the current model, don't look any further.
         if attr in self.__dict__:
             return self.__dict__[attr]
-        
+
         #logger.debug('Looking for a translated field for: %s' % attr)
-            
+
         # See whether we can find a translation for the field
         translated_fields = self.translations.model._meta.get_all_field_names()
         for field in translated_fields:
             code = None
-            
+
             # Only consider attributes starting with this field name
             if attr.startswith(field):
                 # If we have a match, see if we can re-match the language code in
@@ -103,21 +104,21 @@ class MultilingualModel(models.Model):
 
                     # TODO: CLEANUP
                     # This is ugly code and redundant.
-                    
+
                     if ext_code:
                         code = '%s-%s' % (base_code, ext_code)
                     else:
                         code = base_code
-                
+
                     logger.debug('Regular expression match, resulting code: %s' % code)
-                
+
                 elif attr in translated_fields:
                     code = self._language
                     base_code = None
                     field = attr
-                
+
                     logger.debug('Regular expression not matched but translated field detected.')
-                
+
             if code:
                 try:
                     return self._get_translation(field, code)
@@ -129,44 +130,72 @@ class MultilingualModel(models.Model):
                         base_pos = code.find('-')
                         if base_pos > 0:
                             base_code = code[:base_pos]
-                    
+
                     if base_code:
-                    
-                        logger.debug('Attempting a match for the base \'%s\'', 
+
+                        logger.debug('Attempting a match for the base \'%s\'',
                                      base_code)
-                        
+
                         try:
                             return self._get_translation(field, base_code)
                         except ObjectDoesNotExist:
                             pass
-                    
+
                     logger.debug('Lookup failed, attempting fallback or failing silently.')
-                    
+
                     # If we're using a default language and the current
                     # language is not the default language (which has already
                     # been checked), lookup the value for the default language.
                     if settings.FALL_BACK_TO_DEFAULT and \
                        settings.DEFAULT_LANGUAGE and \
                        code != settings.DEFAULT_LANGUAGE:
-               
+
                         try:
                             return self._get_translation(field, settings.DEFAULT_LANGUAGE)
 
                         except ObjectDoesNotExist:
                             pass
-            
+
                     if settings.FAIL_SILENTLY:
                         return None
-            
+
                     raise ValueError, "'%s' object with pk '%s' has no translation to '%s'" \
                         % (self._meta.object_name, self.pk, code)
-    
-        
+
+
         raise AttributeError, "'%s' object has no attribute '%s'" \
             % (self._meta.object_name, str(attr))
-    
+
     def for_language(self, code):
         """Sets the language for the translation fields of this object"""
-        
+
         if code is not None and len(code) >= 2 and len(code) <= 5:
             self._language = code
+
+    def unicode_wrapper(self, property, default=ugettext('Untitled')):
+        """
+        Wrapper to allow for easy unicode representation of an object by
+        the specified property. If this wrapper is not able to find the
+        right translation of the specified property, it will return the
+        default value instead.
+        
+        Example::
+            def __unicode__(self):
+                return unicode_wrapper('name', default='Unnamed')
+            
+        """
+
+        try:
+            value = getattr(self, property)
+        except ValueError:
+            logger.warn('ValueError rendering unicode for %s object.' % \
+                            self._meta.object_name)
+
+            value = None
+
+        if not value:
+            value = default
+
+        return value
+
+
