@@ -79,7 +79,8 @@ class MultilingualModel(models.Model):
 
         field_value = getattr(translation_obj, field)
 
-        logger.debug('Found translation object %s, returning value %s.' % (translation_obj, field_value))
+        logger.debug('Found translation object %s, returning value %s.' \
+                                            % (translation_obj, field_value))
 
         return field_value
 
@@ -154,7 +155,8 @@ class MultilingualModel(models.Model):
                        code != settings.DEFAULT_LANGUAGE:
 
                         try:
-                            return self._get_translation(field, settings.DEFAULT_LANGUAGE)
+                            return self._get_translation(field, \
+                                                    settings.DEFAULT_LANGUAGE)
 
                         except ObjectDoesNotExist:
                             pass
