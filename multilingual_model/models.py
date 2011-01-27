@@ -2,6 +2,8 @@ import logging
 
 logger = logging.getLogger('multilingual_model')
 
+from django.utils.translation import ugettext_lazy as _
+
 from django.utils.translation import ugettext
 from django.db import models
 from django.utils.translation import get_language
@@ -23,8 +25,9 @@ class MultilingualTranslation(models.Model):
     class Meta:
         abstract = True
 
-    language_code = models.CharField(max_length=5, choices=settings.LANGUAGES,
-                                     blank=False, null=False)
+    language_code = models.CharField(_('language'), max_length=5,
+                                     choices=settings.LANGUAGES,
+                                     blank=False, null=False, )
 
 
 class MultilingualModel(models.Model):
