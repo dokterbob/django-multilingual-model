@@ -23,7 +23,11 @@ class TranslationFormSet(BaseInlineFormSet):
         if len(self.forms) > 0:
             # If a default language has been provided, make sure a translation
             # is available
-            if settings.DEFAULT_LANGUAGE:
+
+            if settings.DEFAULT_LANGUAGE and not any(self.errors):
+                # Don't bother validating the formset unless each form is valid on its own
+                # http://docs.djangoproject.com/en/dev/topics/forms/formsets/#custom-formset-validation
+
                 default_translation_available = False
 
                 for form in self.forms:
