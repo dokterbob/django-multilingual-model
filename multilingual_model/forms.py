@@ -44,6 +44,11 @@ class TranslationFormSet(BaseInlineFormSet):
         else:
             raise forms.ValidationError(_('At least one translation should be provided.'))
 
+    def _construct_available_languages(self):
+        self.available_languages = [choice[0] \
+            for choice in self.form.base_fields['language_code'].choices
+            if choice[0] != '']
+
     def _construct_forms(self):
         """
         Before we're constructing forms, make sure a complete list of
@@ -51,11 +56,34 @@ class TranslationFormSet(BaseInlineFormSet):
         for the language_code field.
         """
 
-        self.available_languages = [choice[0] \
-            for choice in self.form.base_fields['language_code'].choices
-            if choice[0] != '']
+        self._construct_available_languages()
 
         super(TranslationFormSet, self)._construct_forms()
+
+    def _get_default_language(self):
+        """
+        If a default language has been set, and is still available in
+        `self.available_languages`, return it and remove it from the list.
+
+        If not, simply pop the first available language.
+        """
+
+        assert hasattr(self, 'available_languages'), \
+            'No available languages have been generated.'
+        assert len(self.available_languages) > 0, \
+            'No available languages to select from.'
+
+
+        if settings.DEFAULT_LANGUAGE \
+                and settings.DEFAULT_LANGUAGE in self.available_languages:
+            # Default language still available
+
+            self.available_languages.remove(settings.DEFAULT_LANGUAGE)
+            return settings.DEFAULT_LANGUAGE
+
+        else:
+            # Select the first item and return it
+            return self.available_languages.pop(0)
 
     def _construct_form(self, i, **kwargs):
         """
@@ -80,7 +108,7 @@ class TranslationFormSet(BaseInlineFormSet):
         if instance:
             self.available_languages.remove(instance.language_code)
         else:
-            kwargs['initial'] = {'language_code': \
-                self.available_languages.pop(0)}
+            kwargs['initial'] = \
+                {'language_code': self._get_default_language()}
 
         return super(BaseInlineFormSet, self)._construct_form(i, **kwargs)
