@@ -55,7 +55,7 @@ class MultilingualModel(models.Model):
         if not self._translation_cache.has_key(code):
             translations = self.translations.select_related()
 
-            logger.debug('Matched with field %s for language %s. Attempting lookup.' % (field, code))
+            logger.debug(u'Matched with field %s for language %s. Attempting lookup.' % (field, code))
 
             try:
                 translation_obj = translations.get(language_code=code)
@@ -65,10 +65,10 @@ class MultilingualModel(models.Model):
 
             self._translation_cache[code] = translation_obj
 
-            logger.debug('Translation not found in cache.')
+            logger.debug(u'Translation not found in cache.')
 
         else:
-            logger.debug('Translation found in cache.')
+            logger.debug(u'Translation found in cache.')
             # Get the translation from the cache
             translation_obj = self._translation_cache.get(code)
 
@@ -79,8 +79,8 @@ class MultilingualModel(models.Model):
 
         field_value = getattr(translation_obj, field)
 
-        logger.debug('Found translation object %s, returning value %s.' \
-                                            % (translation_obj, field_value))
+        logger.debug(u'Found translation object %s, returning value %s.',
+                     translation_obj, field_value)
 
         return field_value
 
@@ -90,7 +90,7 @@ class MultilingualModel(models.Model):
         if attr in self.__dict__:
             return self.__dict__[attr]
 
-        #logger.debug('Looking for a translated field for: %s' % attr)
+        #logger.debug(u'Looking for a translated field for: %s', attr)
 
         # See whether we can find a translation for the field
         translated_fields = self.translations.model._meta.get_all_field_names()
@@ -114,14 +114,15 @@ class MultilingualModel(models.Model):
                     else:
                         code = base_code
 
-                    logger.debug('Regular expression match, resulting code: %s' % code)
+                    logger.debug(u'Regular expression match, resulting code: %s',
+                                 code)
 
                 elif attr in translated_fields:
                     code = self._language
                     base_code = None
                     field = attr
 
-                    logger.debug('Regular expression not matched but translated field detected.')
+                    logger.debug(u'Regular expression not matched but translated field detected.')
 
             if code:
                 try:
@@ -137,7 +138,7 @@ class MultilingualModel(models.Model):
 
                     if base_code:
 
-                        logger.debug('Attempting a match for the base \'%s\'',
+                        logger.debug(u'Attempting a match for the base \'%s\'',
                                      base_code)
 
                         try:
@@ -145,7 +146,7 @@ class MultilingualModel(models.Model):
                         except ObjectDoesNotExist:
                             pass
 
-                    logger.debug('Lookup failed, attempting fallback or failing silently.')
+                    logger.debug(u'Lookup failed, attempting fallback or failing silently.')
 
                     # If we're using a default language and the current
                     # language is not the default language (which has already
@@ -168,7 +169,7 @@ class MultilingualModel(models.Model):
                         % (self._meta.object_name, self.pk, code)
 
 
-        raise AttributeError, "'%s' object has no attribute '%s'" \
+        raise AttributeError, u"'%s' object has no attribute '%s'" \
             % (self._meta.object_name, str(attr))
 
     def for_language(self, code):
@@ -193,8 +194,8 @@ class MultilingualModel(models.Model):
         try:
             value = getattr(self, property)
         except ValueError:
-            logger.warn('ValueError rendering unicode for %s object.' % \
-                            self._meta.object_name)
+            logger.warn(u'ValueError rendering unicode for %s object.',
+                        self._meta.object_name)
 
             value = None
 
