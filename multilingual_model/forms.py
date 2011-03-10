@@ -1,4 +1,7 @@
-from django.db import connections
+import logging
+
+logger = logging.getLogger(__name__)
+
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import BaseInlineFormSet
 from django import forms
@@ -87,28 +90,22 @@ class TranslationFormSet(BaseInlineFormSet):
 
     def _construct_form(self, i, **kwargs):
         """
-        This code has been taken literally from the superclass, as it seemed
-        not possible to make initials depend on the values of the
-        language code for instanaces.
+        Construct the form, overriding the initial value for `language_code`.
         """
+        form = super(TranslationFormSet, self)._construct_form(i, **kwargs)
 
-        if self.is_bound and i < self.initial_form_count():
-            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
-            pk = self.data[pk_key]
-            pk_field = self.model._meta.pk
-            pk = pk_field.get_db_prep_lookup('exact', pk,
-                connection=connections[self.get_queryset().db])
-            if isinstance(pk, list):
-                pk = pk[0]
-            kwargs['instance'] = self._existing_object(pk)
-        if i < self.initial_form_count() and not kwargs.get('instance'):
-            kwargs['instance'] = self.get_queryset()[i]
+        language_code = form.instance.language_code
 
-        instance = kwargs.get('instance', None)
-        if instance:
-            self.available_languages.remove(instance.language_code)
+        if language_code:
+            logger.debug(u'Removing translation choice %s for instance %s in form %d',
+                         language_code, form.instance, i)
+            self.available_languages.remove(language_code)
+
         else:
-            kwargs['initial'] = \
-                {'language_code': self._get_default_language()}
+            initial_language_code = self._get_default_language()
+            logger.debug(u'Preselecting language code %s for form %d',
+                         initial_language_code, i)
 
-        return super(BaseInlineFormSet, self)._construct_form(i, **kwargs)
+            form.initial['language_code'] = initial_language_code
+
+        return form
