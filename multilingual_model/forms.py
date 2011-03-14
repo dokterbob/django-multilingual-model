@@ -31,18 +31,16 @@ class TranslationFormSet(BaseInlineFormSet):
                 # Don't bother validating the formset unless each form is valid on its own
                 # http://docs.djangoproject.com/en/dev/topics/forms/formsets/#custom-formset-validation
 
-                default_translation_available = False
-
                 for form in self.forms:
                     if form.cleaned_data.get('language_code', None) \
                             == settings.DEFAULT_LANGUAGE:
-                        default_translation_available = True
-                        break
 
-                    if not default_translation_available:
-                        raise forms.ValidationError(_('No translation \
-                                provided for default language \'%s\'.') \
-                                % settings.DEFAULT_LANGUAGE)
+                        # All is good, don't bother checking any further
+                        return
+
+                raise forms.ValidationError(_('No translation \
+                        provided for default language \'%s\'.') \
+                        % settings.DEFAULT_LANGUAGE)
 
         else:
             raise forms.ValidationError(_('At least one translation should be provided.'))
