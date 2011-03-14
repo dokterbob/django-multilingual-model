@@ -23,6 +23,9 @@ class TranslationFormSet(BaseInlineFormSet):
         translations.
         """
 
+        # First make sure the super's clean method is called upon.
+        super(TranslationFormSet, self).clean()
+
         if len(self.forms) > 0:
             # If a default language has been provided, make sure a translation
             # is available
