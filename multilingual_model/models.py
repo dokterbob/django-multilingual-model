@@ -165,7 +165,7 @@ class MultilingualModel(models.Model):
                     if settings.FAIL_SILENTLY:
                         return None
 
-                    raise ValueError, "'%s' object with pk '%s' has no translation to '%s'" \
+                    raise ValueError, u"'%s' object with pk '%s' has no translation to '%s'" \
                         % (self._meta.object_name, self.pk, code)
 
 
