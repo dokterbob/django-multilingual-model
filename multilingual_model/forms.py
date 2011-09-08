@@ -26,6 +26,9 @@ class TranslationFormSet(BaseInlineFormSet):
         # First make sure the super's clean method is called upon.
         super(TranslationFormSet, self).clean()
 
+        if settings.AUTO_HIDE_LANGUAGE:
+            return
+
         if len(self.forms) > 0:
             # If a default language has been provided, make sure a translation
             # is available
@@ -59,8 +62,8 @@ class TranslationFormSet(BaseInlineFormSet):
         languages is available. This is used to select sensible defaults
         for the language_code field.
         """
-
-        self._construct_available_languages()
+        if not settings.AUTO_HIDE_LANGUAGE:
+            self._construct_available_languages()
 
         super(TranslationFormSet, self)._construct_forms()
 
@@ -78,8 +81,9 @@ class TranslationFormSet(BaseInlineFormSet):
             'No available languages to select from.'
 
 
-        if settings.DEFAULT_LANGUAGE \
-                and settings.DEFAULT_LANGUAGE in self.available_languages:
+        if (settings.DEFAULT_LANGUAGE \
+            and settings.DEFAULT_LANGUAGE in self.available_languages) or \
+            'language_code' not in self.form.base_fields:
             # Default language still available
 
             self.available_languages.remove(settings.DEFAULT_LANGUAGE)
@@ -95,18 +99,21 @@ class TranslationFormSet(BaseInlineFormSet):
         """
         form = super(TranslationFormSet, self)._construct_form(i, **kwargs)
 
-        language_code = form.instance.language_code
-
-        if language_code:
-            logger.debug(u'Removing translation choice %s for instance %s in form %d',
-                         language_code, form.instance, i)
-            self.available_languages.remove(language_code)
-
+        if settings.AUTO_HIDE_LANGUAGE:
+            form.instance.language_code = settings.DEFAULT_LANGUAGE
         else:
-            initial_language_code = self._get_default_language()
-            logger.debug(u'Preselecting language code %s for form %d',
-                         initial_language_code, i)
+            language_code = form.instance.language_code
 
-            form.initial['language_code'] = initial_language_code
+            if language_code:
+                logger.debug(u'Removing translation choice %s for instance %s in form %d',
+                             language_code, form.instance, i)
+                self.available_languages.remove(language_code)
+
+            else:
+                initial_language_code = self._get_default_language()
+                logger.debug(u'Preselecting language code %s for form %d',
+                             initial_language_code, i)
+
+                form.initial['language_code'] = initial_language_code
 
         return form
