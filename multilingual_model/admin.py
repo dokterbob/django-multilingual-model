@@ -11,6 +11,7 @@ class TranslationInline(admin.StackedInline):
 
         if settings.AUTO_HIDE_LANGUAGE:
             self.exclude = ('language_code', )
+            self.can_delete = False
 
     extra = 1
     formset = TranslationFormSet
