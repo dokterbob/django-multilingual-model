@@ -79,5 +79,4 @@ In order to make translation of the `__unicode__` function work, some magic
 is required. A helper method for this is included by default, allowing you to do the following::
 
 	def __unicode__(self):
-	    return self.update_wrapper('name')
-	
+	    return self.unicode_wrapper('title', default='Unnamed')
