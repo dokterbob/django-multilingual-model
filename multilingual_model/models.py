@@ -40,7 +40,31 @@ class MultilingualModel(models.Model):
         super(MultilingualModel, self).__init__(*args, **kwargs)
         self._language = get_language()
 
-    def _get_translation_object(code):
+    @classmethod
+    def get_translations_queryset(cls, qs, code=None):
+        """
+        Return a queryset for which translations have been prefetched,
+        optionally filtering for a specific language code is done.
+        """
+
+        # Add translations to prefetch
+        prefetches = qs._prefetch_related_lookups
+
+        if not 'translations' in prefetches:
+            prefetches.append('translations')
+
+        qs = qs.prefetch_related(*prefetches)
+
+        # Filter the current language (optional)
+        if code:
+            qs = qs.filter(
+                models.Q(translations=None) |
+                models.Q(translations__language_code=code)
+            )
+
+        return qs
+
+    def _get_translation_object(self, code):
         """
         Get translation of the current object for lang or None.
 
