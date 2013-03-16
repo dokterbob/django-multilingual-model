@@ -39,7 +39,20 @@ class MultilingualModel(models.Model):
     def __init__(self, *args, **kwargs):
         super(MultilingualModel, self).__init__(*args, **kwargs)
         self._language = get_language()
-        self._translation_cache = {}
+
+    def _get_translation_object(code):
+        """
+        Get translation of the current object for lang or None.
+
+        This assumes the translations are pre-cached by prefetch_related().
+        """
+
+        for translation in self.translations.all():
+            if translation.language_code == code:
+                return translation
+
+        # No translation found
+        return None
 
     def _get_translation(self, field, code):
         """
@@ -52,31 +65,14 @@ class MultilingualModel(models.Model):
         the old state would remain.
         """
 
-        if not code in self._translation_cache:
-            translations = self.translations.select_related()
+        translation_obj = self._get_translation_object(code)
 
-            logger.debug(
-                u'Matched with field %s for language %s. Attempting lookup.',
-                field, code
-            )
-
-            try:
-                translation_obj = translations.get(language_code=code)
-
-            except ObjectDoesNotExist:
-                translation_obj = None
-
-            self._translation_cache[code] = translation_obj
-
-            logger.debug(u'Translation not found in cache.')
-
-        else:
-            logger.debug(u'Translation found in cache.')
-            # Get the translation from the cache
-            translation_obj = self._translation_cache.get(code)
+        logger.debug(
+            u'Matched with field %s for language %s. Attempting lookup.',
+            field, code
+        )
 
         # If this is none, it means that a translation does not exist
-        # It is important to cache this one as well
         if not translation_obj:
             raise ObjectDoesNotExist
 
