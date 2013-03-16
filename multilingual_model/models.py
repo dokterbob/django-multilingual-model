@@ -34,7 +34,7 @@ class MultilingualTranslation(models.Model):
 
 
 class MultilingualModel(models.Model):
-    """Provides support for multilingual fields. """
+    """ Provides support for multilingual fields. """
 
     class Meta:
         abstract = True
