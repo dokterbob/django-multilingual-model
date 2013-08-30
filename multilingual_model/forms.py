@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms.models import BaseInlineFormSet
 from django import forms
 
-from multilingual_model import settings
+from . import settings
 
 
 class TranslationFormSet(BaseInlineFormSet):
@@ -34,27 +34,35 @@ class TranslationFormSet(BaseInlineFormSet):
             # is available
 
             if settings.DEFAULT_LANGUAGE and not any(self.errors):
-                # Don't bother validating the formset unless each form is valid on its own
+                # Don't bother validating the formset unless each form is
+                # valid on its own. Reference:
                 # http://docs.djangoproject.com/en/dev/topics/forms/formsets/#custom-formset-validation
 
                 for form in self.forms:
-                    if form.cleaned_data.get('language_code', None) \
-                            == settings.DEFAULT_LANGUAGE:
+                    language_code = form.cleaned_data.get(
+                        'language_code', None
+                    )
+
+                    if language_code == settings.DEFAULT_LANGUAGE:
 
                         # All is good, don't bother checking any further
                         return
 
-                raise forms.ValidationError(_('No translation \
-                        provided for default language \'%s\'.') \
-                        % settings.DEFAULT_LANGUAGE)
+                raise forms.ValidationError(_(
+                    'No translation provided for default language \'%s\'.'
+                ) % settings.DEFAULT_LANGUAGE)
 
         else:
-            raise forms.ValidationError(_('At least one translation should be provided.'))
+            raise forms.ValidationError(
+                _('At least one translation should be provided.')
+            )
 
     def _construct_available_languages(self):
-        self.available_languages = [choice[0] \
+        self.available_languages = [
+            choice[0]
             for choice in self.form.base_fields['language_code'].choices
-            if choice[0] != '']
+            if choice[0] != ''
+        ]
 
     def _construct_forms(self):
         """
@@ -80,10 +88,12 @@ class TranslationFormSet(BaseInlineFormSet):
         assert len(self.available_languages) > 0, \
             'No available languages to select from.'
 
-
-        if (settings.DEFAULT_LANGUAGE \
-            and settings.DEFAULT_LANGUAGE in self.available_languages) or \
-            'language_code' not in self.form.base_fields:
+        if (
+            settings.DEFAULT_LANGUAGE and
+            settings.DEFAULT_LANGUAGE in self.available_languages
+        ) or (
+            'language_code' not in self.form.base_fields
+        ):
             # Default language still available
 
             self.available_languages.remove(settings.DEFAULT_LANGUAGE)
@@ -105,14 +115,20 @@ class TranslationFormSet(BaseInlineFormSet):
             language_code = form.instance.language_code
 
             if language_code:
-                logger.debug(u'Removing translation choice %s for instance %s in form %d',
-                             language_code, form.instance, i)
+                logger.debug(
+                    u'Removing translation choice %s for instance %s'
+                    u' in form %d', language_code, form.instance, i
+                )
+
                 self.available_languages.remove(language_code)
 
             else:
                 initial_language_code = self._get_default_language()
-                logger.debug(u'Preselecting language code %s for form %d',
-                             initial_language_code, i)
+
+                logger.debug(
+                    u'Preselecting language code %s for form %d',
+                    initial_language_code, i
+                )
 
                 form.initial['language_code'] = initial_language_code
 

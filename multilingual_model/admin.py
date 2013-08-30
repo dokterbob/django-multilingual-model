@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from multilingual_model.forms import TranslationFormSet
-from multilingual_model import settings
-MAX_LANGUAGES = len(settings.LANGUAGES)
+from .forms import TranslationFormSet
+from . import settings
 
 
 class TranslationInline(admin.StackedInline):
@@ -15,4 +14,4 @@ class TranslationInline(admin.StackedInline):
 
     extra = 1
     formset = TranslationFormSet
-    max_num = MAX_LANGUAGES
+    max_num = len(settings.LANGUAGES)
