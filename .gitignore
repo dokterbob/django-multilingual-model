@@ -3,4 +3,8 @@
 *.pyo
 .DS\_Store
 *.sw?
+*.egg
 *.egg-info*
+
+pep8.txt
+coverage.xml
