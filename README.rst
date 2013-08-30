@@ -4,11 +4,10 @@ django-multilingual-model
 .. image:: https://secure.travis-ci.org/dokterbob/django-multilingual-model.png?branch=master
     :target: http://travis-ci.org/dokterbob/django-multilingual-model
 
-Django Simple Multilingual Support for Models.
+Django Simple Multilingual Support for Models
+---------------------------------------------
 
-This is strongly based upon an original project by yazzgoth on Google code.
-
-The original can be found at: http://code.google.com/p/django-multilingual-model/
+This is strongly based upon an `original project <http://code.google.com/p/django-multilingual-model/>`_ by yazzgoth on Google code.
 
 Usage
 -----
