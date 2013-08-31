@@ -62,10 +62,10 @@ admin.py::
 	from django.contrib import admin
 	import models
 
-	from multilingual_model.admin import TranslationInline
+	from multilingual_model.admin import TranslationStackedInline
 
 
-	class BookTranslationInline(TranslationInline):
+	class BookTranslationInline(TranslationStackedInline):
 	   model = models.BookTranslation
 
 	class BookAdmin(admin.ModelAdmin):

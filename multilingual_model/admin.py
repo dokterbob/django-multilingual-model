@@ -28,3 +28,11 @@ class TranslationTabularInline(admin.TabularInline):
     extra = 1
     formset = TranslationFormSet
     max_num = len(settings.LANGUAGES)
+
+
+class TranslationInline(TranslationStackedInline):
+    def __new__(self):
+        from warnings import warn
+        warn_msg = "TranslationInline is deprecated!"
+            " Use TranslationStackedInline or"
+            " TranslationTabularInline instead."
