@@ -4,9 +4,22 @@ from .forms import TranslationFormSet
 from . import settings
 
 
-class TranslationInline(admin.StackedInline):
+class TranslationStackedInline(admin.StackedInline):
     def __init__(self, *args, **kwargs):
-        super(TranslationInline, self).__init__(*args, **kwargs)
+        super(TranslationStackedInline, self).__init__(*args, **kwargs)
+
+        if settings.AUTO_HIDE_LANGUAGE:
+            self.exclude = ('language_code', )
+            self.can_delete = False
+
+    extra = 1
+    formset = TranslationFormSet
+    max_num = MAX_LANGUAGES
+
+
+class TranslationTabularInline(admin.TabularInline):
+    def __init__(self, *args, **kwargs):
+        super(TranslationTabularInline, self).__init__(*args, **kwargs)
 
         if settings.AUTO_HIDE_LANGUAGE:
             self.exclude = ('language_code', )
@@ -15,3 +28,11 @@ class TranslationInline(admin.StackedInline):
     extra = 1
     formset = TranslationFormSet
     max_num = len(settings.LANGUAGES)
+
+
+class TranslationInline(TranslationStackedInline):
+    def __new__(self):
+        from warnings import warn
+        warn_msg = "TranslationInline is deprecated!"
+            " Use TranslationStackedInline or"
+            " TranslationTabularInline instead."

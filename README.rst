@@ -62,10 +62,10 @@ admin.py::
 	from django.contrib import admin
 	import models
 
-	from multilingual_model.admin import TranslationInline
+	from multilingual_model.admin import TranslationStackedInline
 
 
-	class BookTranslationInline(TranslationInline):
+	class BookTranslationInline(TranslationStackedInline):
 	   model = models.BookTranslation
 
 	class BookAdmin(admin.ModelAdmin):
@@ -83,3 +83,18 @@ is required. A helper method for this is included by default, allowing you to do
 
 	def __unicode__(self):
 	    return self.unicode_wrapper('title', default='Unnamed')
+
+Upgrade from previous versions
+==============================
+
+If you upgrade from previous versions you need to be aware of two important facts:
+
+1.  The Model MultilingualTranslation in multilingual_model.models has a field
+    named "language_code". In prior versions the max_length was set to 5. This has
+    been changed to 7 to allow longer language codes to be valid. This
+    could break validation in certain situations. A way to reflect this change on
+    the level of the database is to manually change the database table of the models
+    that are translated.
+2.  In admin.py the class TranslationInline has been renamed to
+    TranslationStackedInline. TranslationInline will be deprecated soon. Additionally
+    to TranslationStackedInline there now is a TranslationTabularInline.
