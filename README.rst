@@ -91,7 +91,7 @@ If you upgrade from previous versions you need to be aware of two important fact
 
 1.  The Model MultilingualTranslation in multilingual_model.models has a field
     named "language_code". In prior versions the max_length was set to 5. This has
-    been changed to 7 to allow language codes. This
+    been changed to 7 to allow longer language codes to be valid. This
     could break validation in certain situations. A way to reflect this change on
     the level of the database is to manually change the database table of the models
     that are translated.
