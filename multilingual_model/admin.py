@@ -1,3 +1,5 @@
+import warnings
+
 from django.contrib import admin
 
 from .forms import TranslationFormSet
@@ -14,7 +16,7 @@ class TranslationStackedInline(admin.StackedInline):
 
     extra = 1
     formset = TranslationFormSet
-    max_num = MAX_LANGUAGES
+    max_num = len(settings.LANGUAGES)
 
 
 class TranslationTabularInline(admin.TabularInline):
@@ -31,8 +33,10 @@ class TranslationTabularInline(admin.TabularInline):
 
 
 class TranslationInline(TranslationStackedInline):
-    def __new__(self):
-        from warnings import warn
-        warn_msg = "TranslationInline is deprecated!"
-            " Use TranslationStackedInline or"
-            " TranslationTabularInline instead."
+    def __init__(self, *args, **kwargs):
+        warnings.warn(DeprecationWarning(
+            "TranslationInline is deprecated; "
+            "use TranslationStackedInline or TranslationTabularInline instead."
+        ))
+
+        return super(TranslationInline, self).__init__(*args, **kwargs)
