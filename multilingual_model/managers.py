@@ -13,13 +13,7 @@ class TranslationQuerySetMixin(object):
         optionally filtering for a specific language code is done.
         """
 
-        # Add translations to prefetch
-        prefetches = self._prefetch_related_lookups
-
-        if not 'translations' in prefetches:
-            prefetches.append('translations')
-
-        qs = self.prefetch_related(*prefetches)
+        qs = self.prefetch_related('translations')
 
         # Filter the current language (optional)
         if language_code:
