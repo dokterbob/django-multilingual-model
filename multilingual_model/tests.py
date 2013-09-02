@@ -180,3 +180,29 @@ class BookTestCase(TestCase):
         # Check if the language set in book's init is actually the right
         # language.
         self.assertEquals(book._language, test_lang)
+
+    def test_get_translations_queryset(self):
+        """ Test query optimizations with get_translations_queryset. """
+
+        books = Book.objects.all()
+
+        # Assert that unoptimized queries are indeed unoptimized
+        with self.assertNumQueries(1):
+            book = books[0]
+
+        with self.assertNumQueries(3):
+            self.assertTrue(book.title_en)
+            self.assertTrue(book.title_en_us)
+            self.assertTrue(book.title_pl)
+
+        # Prepare a queryset with all translations
+        with self.assertNumQueries(0):
+            books_translated = Book.get_translations_queryset(books)
+
+        with self.assertNumQueries(2):
+            book = books_translated[0]
+
+        with self.assertNumQueries(0):
+            self.assertTrue(book.title_en)
+            self.assertTrue(book.title_en_us)
+            self.assertTrue(book.title_pl)
