@@ -10,9 +10,6 @@ from django.db import models
 from django.utils.translation import get_language
 from django.core.exceptions import ObjectDoesNotExist
 
-# What does this line of code do?
-models.options.DEFAULT_NAMES += ('translation', 'multilingual')
-
 from . import settings
 
 # Match something like en, but also en_us
@@ -97,8 +94,6 @@ class MultilingualModel(models.Model):
         # look any further.
         if attr in self.__dict__:
             return self.__dict__[attr]
-
-        #logger.debug(u'Looking for a translated field for: %s', attr)
 
         # See whether we can find a translation for the field
         translated_fields = self.translations.model._meta.get_all_field_names()
@@ -197,12 +192,6 @@ class MultilingualModel(models.Model):
                 self._meta.object_name, str(attr)
             )
         )
-
-    def for_language(self, code):
-        """Sets the language for the translation fields of this object"""
-
-        if code is not None and len(code) >= 2 and len(code) <= 7:
-            self._language = code
 
     def unicode_wrapper(self, property, default=ugettext('Untitled')):
         """
