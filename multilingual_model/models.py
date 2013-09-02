@@ -93,6 +93,7 @@ class MultilingualModel(models.Model):
         # If an attribute is defined in the current model, don't
         # look any further.
         if attr in self.__dict__:
+            # TODO: Test coverage!
             return self.__dict__[attr]
 
         # See whether we can find a translation for the field
@@ -122,6 +123,8 @@ class MultilingualModel(models.Model):
                     )
 
                 elif attr in translated_fields:
+                    # TODO: Test coverage!
+
                     code = self._language
                     base_code = None
                     field = attr
@@ -139,6 +142,7 @@ class MultilingualModel(models.Model):
                     # TODO: CLEANUP
                     # This is ugly code and redundant.
                     if not base_code:
+                        # TODO: Test coverage!
                         base_pos = code.find('-')
                         if base_pos > 0:
                             base_code = code[:base_pos]
@@ -175,8 +179,10 @@ class MultilingualModel(models.Model):
                             )
 
                         except ObjectDoesNotExist:
+                            # TODO: Test coverage!
                             pass
 
+                    # TODO: Test coverage!
                     if settings.FAIL_SILENTLY:
                         return None
 
@@ -205,7 +211,7 @@ class MultilingualModel(models.Model):
                 return unicode_wrapper('name', default='Unnamed')
 
         """
-
+        # TODO: Test coverage!
         try:
             value = getattr(self, property)
         except ValueError:
