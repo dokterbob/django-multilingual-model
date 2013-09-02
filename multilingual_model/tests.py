@@ -209,16 +209,16 @@ class BookTestCase(TestCase):
             self.assertTrue(book.title_en_us)
             self.assertTrue(book.title_pl)
 
-    def test_with_translations_filter(self):
-        """ Test optimized query with language filter. """
+    def test_for_languages(self):
+        """
+        Test filtering objects translated to particular languages.
+        """
 
-        # Prepare a queryset with all translations
-        books = Book.objects.with_translations('pl')
+        books = Book.objects.translated_to('pl')
+        self.assertEquals(books.count(), 1)
 
-        with self.assertNumQueries(2):
-            book = books[0]
+        books = Book.objects.translated_to(('pl', 'en'))
+        self.assertEquals(books.count(), 1)
 
-        with self.assertNumQueries(0):
-            self.assertTrue(book.title_en)
-            self.assertTrue(book.title_en_us)
-            self.assertTrue(book.title_pl)
+        books = Book.objects.translated_to('dk')
+        self.assertEquals(books.count(), 0)
