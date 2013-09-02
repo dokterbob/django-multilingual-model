@@ -1,5 +1,6 @@
 from django.db import models
 from django.test import TestCase
+from django.utils import translation
 
 from .models import MultilingualModel, MultilingualTranslation
 
@@ -94,7 +95,6 @@ class BookTestCase(TestCase):
 
         for test_lang in ('pl', 'en'):
             # Set the language
-            from django.utils import translation
             translation.activate(test_lang)
 
             # Get the book
@@ -159,3 +159,24 @@ class BookTestCase(TestCase):
             # assert an exception for self.book.title_kk
             with self.assertRaises(AttributeError):
                 self.book.title_dk
+
+    def test_serbian_latin(self):
+        """ Test for language code edge case. """
+
+        test_lang = 'sr-latn'
+
+        book_translation = BookTranslation(language_code=test_lang)
+        book_translation.title = "Django dla Idiotow"
+        book_translation.description = "Django opisane w prostych slowach"
+        book_translation.parent = self.book
+        book_translation.save()
+
+        # Set the language
+        translation.activate(test_lang)
+
+        # Get the book
+        book = Book.objects.get(ISBN=self.book.ISBN)
+
+        # Check if the language set in book's init is actually the right
+        # language.
+        self.assertEquals(book._language, test_lang)

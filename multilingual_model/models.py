@@ -17,7 +17,7 @@ from . import settings
 
 # Match something like en, but also en_us
 LANGUAGE_CODE_RE = re.compile(
-    r'_(?P<base_code>[a-z_]{2,7})(_(?P<ext_code>[a-z_]{2,7})){0,1}$'
+    r'_(?P<base_code>[a-z]{2,7})(_(?P<ext_code>[a-z]{2,7})){0,1}$'
 )
 
 
