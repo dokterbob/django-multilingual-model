@@ -181,8 +181,8 @@ class BookTestCase(TestCase):
         # language.
         self.assertEquals(book._language, test_lang)
 
-    def test_get_translations_queryset(self):
-        """ Test query optimizations with get_translations_queryset. """
+    def test_legacy_query_count(self):
+        """ Test query count for legacy (unoptimized) API. """
 
         books = Book.objects.all()
 
@@ -195,12 +195,28 @@ class BookTestCase(TestCase):
             self.assertTrue(book.title_en_us)
             self.assertTrue(book.title_pl)
 
+    def test_optimized_query(self):
+        """ Test custom QuerySet optimized queries using fetch_related(). """
+
         # Prepare a queryset with all translations
-        with self.assertNumQueries(0):
-            books_translated = Book.get_translations_queryset(books)
+        books = Book.objects.with_translations()
 
         with self.assertNumQueries(2):
-            book = books_translated[0]
+            book = books[0]
+
+        with self.assertNumQueries(0):
+            self.assertTrue(book.title_en)
+            self.assertTrue(book.title_en_us)
+            self.assertTrue(book.title_pl)
+
+    def test_with_translations_filter(self):
+        """ Test optimized query with language filter. """
+
+        # Prepare a queryset with all translations
+        books = Book.objects.with_translations('pl')
+
+        with self.assertNumQueries(2):
+            book = books[0]
 
         with self.assertNumQueries(0):
             self.assertTrue(book.title_en)
