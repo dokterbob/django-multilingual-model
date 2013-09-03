@@ -10,7 +10,7 @@ class TranslationInlineMixin(object):
     def __init__(self, *args, **kwargs):
         super(TranslationInlineMixin, self).__init__(*args, **kwargs)
 
-        if settings.AUTO_HIDE_LANGUAGE:
+        if settings.HIDE_LANGUAGE:
             self.exclude = ('language_code', )
             self.can_delete = False
 

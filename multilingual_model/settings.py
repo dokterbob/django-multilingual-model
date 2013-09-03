@@ -17,6 +17,6 @@ LANGUAGES = getattr(
     settings, 'MULTILINGUAL_LANGUAGES', settings.LANGUAGES
 )
 
-AUTO_HIDE_LANGUAGE = getattr(
-    settings, 'MULTILINGUAL_AUTO_HIDE_LANGUAGE', len(LANGUAGES) == 1
+HIDE_LANGUAGE = getattr(
+    settings, 'MULTILINGUAL_HIDE_LANGUAGE', len(LANGUAGES) == 1
 )

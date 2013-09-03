@@ -26,7 +26,7 @@ class TranslationFormSet(BaseInlineFormSet):
         # First make sure the super's clean method is called upon.
         super(TranslationFormSet, self).clean()
 
-        if settings.AUTO_HIDE_LANGUAGE:
+        if settings.HIDE_LANGUAGE:
             return
 
         if len(self.forms) > 0:
@@ -70,7 +70,7 @@ class TranslationFormSet(BaseInlineFormSet):
         languages is available. This is used to select sensible defaults
         for the language_code field.
         """
-        if not settings.AUTO_HIDE_LANGUAGE:
+        if not settings.HIDE_LANGUAGE:
             self._construct_available_languages()
 
         super(TranslationFormSet, self)._construct_forms()
@@ -109,7 +109,7 @@ class TranslationFormSet(BaseInlineFormSet):
         """
         form = super(TranslationFormSet, self)._construct_form(i, **kwargs)
 
-        if settings.AUTO_HIDE_LANGUAGE:
+        if settings.HIDE_LANGUAGE:
             form.instance.language_code = settings.DEFAULT_LANGUAGE
         else:
             language_code = form.instance.language_code

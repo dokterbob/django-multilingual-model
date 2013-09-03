@@ -123,7 +123,7 @@ Settings
 `MULTILINGUAL_LANGUAGES`
 	Set of languages available for translation. Defaults to `LANGUAGES`.
 
-`MULTILINGUAL_AUTO_HIDE_LANGUAGE`
+`MULTILINGUAL_HIDE_LANGUAGE`
 	Hide functionality for selecting the language and removing translations in the admin.
 	Defaults to `True` when `MULTILINGUAL_LANGUAGES` contains of a single language.
 
