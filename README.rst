@@ -104,3 +104,29 @@ If you upgrade from previous versions you need to be aware of two important fact
 2.  In admin.py the class TranslationInline has been renamed to
     TranslationStackedInline. TranslationInline will be deprecated soon. Additionally
     to TranslationStackedInline there now is a TranslationTabularInline.
+
+Settings
+========
+`MULTILINGUAL_FAIL_SILENTLY`
+	Return `None` instead of raising a `ValueError` when a translation for the
+	current language cannot be found and `MULTILINGUAL_FALL_BACK_TO_DEFAULT` is
+	`False`. Defaults to the inverse of `DEBUG`.
+
+`MULTILINGUAL_FALL_BACK_TO_DEFAULT`
+	Whether or not to fall back to `MULTILINGUAL_LANGUAGE_CODE` when no translation
+	can be found for the currently activated language. Defaults to `True`.
+
+`MULTILINGUAL_LANGUAGE_CODE`
+	The default language used when `MULTILINGUAL_FALL_BACK_TO_DEFAULT` is `True`.
+	Defaults to `LANGUAGE_CODE`.
+
+`MULTILINGUAL_LANGUAGES`
+	Set of languages available for translation. Defaults to `LANGUAGES`.
+
+`MULTILINGUAL_AUTO_HIDE_LANGUAGE`
+	Hide functionality for selecting the language and removing translations in the admin.
+	Defaults to `True` when `MULTILINGUAL_LANGUAGES` contains of a single language.
+
+License
+=======
+This application is released under the GNU Affero General Public License version 3.
