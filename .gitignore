@@ -8,3 +8,5 @@
 
 pep8.txt
 coverage.xml
+build
+dist
