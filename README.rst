@@ -1,16 +1,24 @@
+=========================
 django-multilingual-model
 =========================
 
 .. image:: https://secure.travis-ci.org/dokterbob/django-multilingual-model.png?branch=master
     :target: http://travis-ci.org/dokterbob/django-multilingual-model
 
-Django Simple Multilingual Support for Models
+Django Simple Multilingual Support for models
 ---------------------------------------------
 
-This is strongly based upon an `original project <http://code.google.com/p/django-multilingual-model/>`_ by yazzgoth on Google code.
+What is it?
+===========
+An inefficient, minimal and utterly simple approach to model translation based
+on foreign key relations and attribute proxying.
+
+The project code is forked from the
+`original project <http://code.google.com/p/django-multilingual-model/>`_ by
+yazzgoth on Google code.
 
 Usage
------
+=====
 When a property of a translation is set for the language currently selected
 in this thread, it will automatically yield the right value of that property
 for the current language. So for a book which has a tranlation in `en`,
@@ -55,7 +63,7 @@ models.py::
 	u'Django opisane w prostych slowach'
 
 Admin integration
------------------
+=================
 
 admin.py::
 
@@ -77,7 +85,6 @@ admin.py::
 
 `__unicode__` representation using translated field
 ===================================================
-
 In order to make translation of the `__unicode__` function work, some magic
 is required. A helper method for this is included by default, allowing you to do the following::
 
@@ -86,7 +93,6 @@ is required. A helper method for this is included by default, allowing you to do
 
 Upgrade from previous versions
 ==============================
-
 If you upgrade from previous versions you need to be aware of two important facts:
 
 1.  The Model MultilingualTranslation in multilingual_model.models has a field
