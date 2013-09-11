@@ -18,7 +18,7 @@ except:
 
 setup(
     name='django-multilingual-model',
-    version='0.5',
+    version='0.5.1',
     description='Django Simple Multilingual Support for Models.',
     long_description=README,
     #install_requires=REQUIREMENTS,
