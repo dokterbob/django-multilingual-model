@@ -64,16 +64,16 @@ class TranslationFormSet(BaseInlineFormSet):
             if choice[0] != ''
         ]
 
-    def _construct_forms(self):
-        """
-        Before we're constructing forms, make sure a complete list of
-        languages is available. This is used to select sensible defaults
-        for the language_code field.
-        """
-        if not settings.HIDE_LANGUAGE:
-            self._construct_available_languages()
+    #def _construct_forms(self):
+        #"""
+        #Before we're constructing forms, make sure a complete list of
+        #languages is available. This is used to select sensible defaults
+        #for the language_code field.
+        #"""
+        #if not settings.HIDE_LANGUAGE:
+            #self._construct_available_languages()
 
-        super(TranslationFormSet, self)._construct_forms()
+        #super(TranslationFormSet, self)._construct_forms()
 
     def _get_default_language(self):
         """
@@ -107,6 +107,9 @@ class TranslationFormSet(BaseInlineFormSet):
         """
         Construct the form, overriding the initial value for `language_code`.
         """
+        if not settings.HIDE_LANGUAGE:
+            self._construct_available_languages()
+
         form = super(TranslationFormSet, self)._construct_form(i, **kwargs)
 
         if settings.HIDE_LANGUAGE:
