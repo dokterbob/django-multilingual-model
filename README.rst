@@ -64,7 +64,7 @@ models.py::
 
 Compatibility
 =============
-Currently Django 1.4 through 1.6 is maintained for Python 2.6 and 2.7.
+Currently Django 1.4 through 1.6 is maintained for Python 2.6, 2.7 and 3.3.
 
 Admin integration
 =================
