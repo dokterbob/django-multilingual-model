@@ -2,8 +2,15 @@
 django-multilingual-model
 =========================
 
+.. image:: https://badge.fury.io/py/django-multilingual-model.png
+    :target: http://badge.fury.io/py/django-multilingual-model
+
 .. image:: https://secure.travis-ci.org/dokterbob/django-multilingual-model.png?branch=master
     :target: http://travis-ci.org/dokterbob/django-multilingual-model
+
+.. image:: https://pypip.in/d/django-multilingual-model/badge.png
+        :target: https://crate.io/packages/django-multilingual-model?version=latest
+
 
 Django Simple Multilingual Support for models
 ---------------------------------------------
