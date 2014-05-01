@@ -62,6 +62,10 @@ models.py::
 	>>> book.description_pl
 	u'Django opisane w prostych slowach'
 
+Compatibility
+=============
+Currently Django 1.4 through 1.6 is maintained for Python 2.6 and 2.7.
+
 Admin integration
 =================
 
