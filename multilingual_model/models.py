@@ -114,8 +114,8 @@ class MultilingualModel(models.Model):
                     else:
                         code = base_code
 
-                    logger.debug(u'Regular expression match, resulting code: %s',
-                                 code)
+                    logger.debug(
+                        u'Regular expression match, resulting code: %s', code)
 
                 elif attr in translated_fields:
                     code = self._language
@@ -156,8 +156,8 @@ class MultilingualModel(models.Model):
                        code != settings.DEFAULT_LANGUAGE:
 
                         try:
-                            return self._get_translation(field, \
-                                                    settings.DEFAULT_LANGUAGE)
+                            return self._get_translation(
+                                field, settings.DEFAULT_LANGUAGE)
 
                         except ObjectDoesNotExist:
                             pass
@@ -184,11 +184,11 @@ class MultilingualModel(models.Model):
         the specified property. If this wrapper is not able to find the
         right translation of the specified property, it will return the
         default value instead.
-        
+
         Example::
             def __unicode__(self):
                 return unicode_wrapper('name', default='Unnamed')
-            
+
         """
 
         try:
