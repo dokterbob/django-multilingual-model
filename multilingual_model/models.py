@@ -40,6 +40,7 @@ class MultilingualModel(models.Model):
         super(MultilingualModel, self).__init__(*args, **kwargs)
         self._language = get_language() or settings.DEFAULT_LANGUAGE
         self._translation_cache = {}
+        self._translated_fields = self.translations.model._meta.get_all_field_names()
 
     def _get_translation(self, field, code):
         """
@@ -93,8 +94,7 @@ class MultilingualModel(models.Model):
         #logger.debug(u'Looking for a translated field for: %s', attr)
 
         # See whether we can find a translation for the field
-        translated_fields = self.translations.model._meta.get_all_field_names()
-        for field in translated_fields:
+        for field in self._translated_fields:
             code = None
 
             # Only consider attributes starting with this field name
@@ -117,7 +117,7 @@ class MultilingualModel(models.Model):
                     logger.debug(
                         u'Regular expression match, resulting code: %s', code)
 
-                elif attr in translated_fields:
+                elif attr in self._translated_fields:
                     code = self._language
                     base_code = None
                     field = attr
