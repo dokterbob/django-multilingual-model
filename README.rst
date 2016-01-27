@@ -1,5 +1,16 @@
 django-multilingual-model
 =========================
+
+.. image:: https://img.shields.io/travis/dokterbob/django-multilingual-model/master.svg
+    :target: http://travis-ci.org/dokterbob/django-multilingual-model
+
+.. image:: https://coveralls.io/repos/dokterbob/django-multilingual-model/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/dokterbob/django-multilingual-model?branch=master
+
+.. image:: https://landscape.io/github/dokterbob/django-multilingual-model/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/dokterbob/django-multilingual-model/master
+   :alt: Code Health
+
 Django Simple Multilingual Support for Models.
 
 This is strongly based upon an original project by yazzgoth on Google code.
