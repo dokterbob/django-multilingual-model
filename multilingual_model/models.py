@@ -38,7 +38,7 @@ class MultilingualModel(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(MultilingualModel, self).__init__(*args, **kwargs)
-        self._language = get_language()
+        self._language = get_language() or settings.DEFAULT_LANGUAGE
         self._translation_cache = {}
 
     def _get_translation(self, field, code):
