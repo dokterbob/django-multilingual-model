@@ -34,7 +34,8 @@ class TranslationFormSet(BaseInlineFormSet):
             # is available
 
             if settings.DEFAULT_LANGUAGE and not any(self.errors):
-                # Don't bother validating the formset unless each form is valid on its own
+                # Don't bother validating the formset unless each form
+                # is valid on its own
                 # http://docs.djangoproject.com/en/dev/topics/forms/formsets/#custom-formset-validation
 
                 for form in self.forms:
@@ -49,12 +50,14 @@ class TranslationFormSet(BaseInlineFormSet):
                         % settings.DEFAULT_LANGUAGE)
 
         else:
-            raise forms.ValidationError(_('At least one translation should be provided.'))
+            raise forms.ValidationError(
+                _('At least one translation should be provided.'))
 
     def _construct_available_languages(self):
-        self.available_languages = [choice[0] \
-            for choice in self.form.base_fields['language_code'].choices
-            if choice[0] != '']
+        self.available_languages = [
+            choice[0] for choice in self.form.base_fields['language_code'].choices
+            if choice[0] != ''
+        ]
 
     def _construct_forms(self):
         """
@@ -80,10 +83,10 @@ class TranslationFormSet(BaseInlineFormSet):
         assert len(self.available_languages) > 0, \
             'No available languages to select from.'
 
-
-        if (settings.DEFAULT_LANGUAGE \
-            and settings.DEFAULT_LANGUAGE in self.available_languages) or \
-            'language_code' not in self.form.base_fields:
+        if (settings.DEFAULT_LANGUAGE
+            and settings.DEFAULT_LANGUAGE in self.available_languages) or (
+            'language_code' not in self.form.base_fields
+        ):
             # Default language still available
 
             self.available_languages.remove(settings.DEFAULT_LANGUAGE)
@@ -105,8 +108,10 @@ class TranslationFormSet(BaseInlineFormSet):
             language_code = form.instance.language_code
 
             if language_code:
-                logger.debug(u'Removing translation choice %s for instance %s in form %d',
-                             language_code, form.instance, i)
+                logger.debug(
+                    u'Removing translation choice %s for instance %s in form %d',
+                    language_code, form.instance, i
+                )
                 self.available_languages.remove(language_code)
 
             else:
