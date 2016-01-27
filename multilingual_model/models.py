@@ -203,5 +203,3 @@ class MultilingualModel(models.Model):
             value = default
 
         return value
-
-
