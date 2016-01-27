@@ -53,7 +53,7 @@ class MultilingualModel(models.Model):
         the old state would remain.
         """
 
-        if not self._translation_cache.has_key(code):
+        if code not in self._translation_cache:
             translations = self.translations.select_related()
 
             logger.debug(u'Matched with field %s for language %s. Attempting lookup.' % (field, code))
@@ -165,12 +165,15 @@ class MultilingualModel(models.Model):
                     if settings.FAIL_SILENTLY:
                         return None
 
-                    raise ValueError, u"'%s' object with pk '%s' has no translation to '%s'" \
-                        % (self._meta.object_name, self.pk, code)
+                    raise ValueError(
+                        "'%s' object with pk '%s' has no translation to '%s'" % (
+                            self._meta.object_name, self.pk, code)
+                    )
 
-
-        raise AttributeError, u"'%s' object has no attribute '%s'" \
-            % (self._meta.object_name, str(attr))
+        raise AttributeError(
+            "'%s' object has no attribute '%s'" % (
+                self._meta.object_name, str(attr))
+        )
 
     def for_language(self, code):
         """Sets the language for the translation fields of this object"""
