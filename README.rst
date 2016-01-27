@@ -30,20 +30,20 @@ book title.
 models.py::
 
 	from multilingual_model.models import MultilingualModel, MultilingualTranslation
-	
+
 	class BookTranslation(MultilingualTranslation):
 	    class Meta:
 	        unique_together = ('parent', 'language_code')
-	    
+
 	    parent = models.ForeignKey('Book', related_name='translations')
-	    
+
 	    title = models.CharField(max_length=32)
 	    description = models.TextField()
-	
+
 	class Book(MultilingualModel):
 	    ISBN = models.IntegerField()
-	
-	
+
+
 	>>> book = Book(ISBN="1234567890")
 	>>> book.save()
 	>>> book_en = BookTranslation(language_code='en')
@@ -69,19 +69,19 @@ admin.py::
 
 	from django.contrib import admin
 	import models
-	
+
 	from multilingual_model.admin import TranslationInline
-	
-	
+
+
 	class BookTranslationInline(TranslationInline):
 	   model = models.BookTranslation
-	
+
 	class BookAdmin(admin.ModelAdmin):
 	   list_display = ["ISBN"]
 	   inlines = [BookTranslationInline]
-	
+
 	admin.site.register(models.Book, BookAdmin)
-	
+
 
 `__unicode__` representation using translated field
 ===================================================
@@ -91,4 +91,4 @@ is required. A helper method for this is included by default, allowing you to do
 
 	def __unicode__(self):
 	    return self.update_wrapper('name')
-	
+
