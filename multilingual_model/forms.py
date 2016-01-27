@@ -3,6 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
 from django.forms.models import BaseInlineFormSet
 from django import forms
 
@@ -59,7 +60,8 @@ class TranslationFormSet(BaseInlineFormSet):
             if choice[0] != ''
         ]
 
-    def _construct_forms(self):
+    @cached_property
+    def forms(self):
         """
         Before we're constructing forms, make sure a complete list of
         languages is available. This is used to select sensible defaults
@@ -68,7 +70,7 @@ class TranslationFormSet(BaseInlineFormSet):
         if not settings.AUTO_HIDE_LANGUAGE:
             self._construct_available_languages()
 
-        super(TranslationFormSet, self)._construct_forms()
+        return super(TranslationFormSet, self).forms
 
     def _get_default_language(self):
         """
