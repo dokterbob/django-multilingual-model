@@ -3,8 +3,8 @@ logger = logging.getLogger('multilingual_model')
 
 import re
 
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 
 from django.db import models
 from django.utils.translation import get_language
@@ -199,7 +199,7 @@ class MultilingualModel(models.Model):
             )
         )
 
-    def unicode_wrapper(self, property, default=ugettext('Untitled')):
+    def unicode_wrapper(self, property, default=gettext('Untitled')):
         """
         Wrapper to allow for easy unicode representation of an object by
         the specified property. If this wrapper is not able to find the

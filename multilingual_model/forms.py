@@ -2,7 +2,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.forms.models import BaseInlineFormSet
 from django import forms
 
